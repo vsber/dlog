@@ -1,3 +1,7 @@
+---
+layout: post
+title: Apache Avro Source
+---
 # avro 源码分析--请求发送
 
 Mail实例中`Mail proxy = SpecificRequestor.getClient(Mail.class, client);`
