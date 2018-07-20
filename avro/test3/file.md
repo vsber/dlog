@@ -1,0 +1,64 @@
+# 序列化
+实例代码参考[github apache avro  java-examples](https://github.com/apache/avro/tree/master/doc/examples/java-example/src/main/java/example)
+
+### 使用avro代码生成的序列化
+如果只是编译schema，使用avro-tools 编译schema模式文件生成代码
+`java -jar avro-tools-1.8.2.jar compile schema  user.avsc  destination-path`，编译schema会生成对应的java类，使用其进行序列化和反序列化
+
+### 无avro代码生成的序列化
+
+schema 文件为user.avsc 如下
+```JSON
+{"namespace": "",
+ "type": "record",
+ "name": "User",
+ "fields": [
+     {"name": "name", "type": "string"},
+     {"name": "favorite_number",  "type": ["int", "null"]},
+     {"name": "favorite_color", "type": ["string", "null"]}
+ ]
+}
+```
+序列化到文件users.avro中，代码如下
+
+```java
+public class GenericMain {
+    public static void main(String[] args) throws IOException {
+        Schema schema = new Parser().parse(new File("/home/avro/user.avsc"));
+
+        GenericRecord user1 = new GenericData.Record(schema);
+        user1.put("name", "Alyssa");
+        user1.put("favorite_number", 256);
+        // Leave favorite color null
+
+        GenericRecord user2 = new GenericData.Record(schema);
+        user2.put("name", "Ben");
+        user2.put("favorite_number", 7);
+        user2.put("favorite_color", "red");
+
+        // Serialize user1 and user2 to disk
+        File file = new File("/home/avro/users.avro");
+        DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<GenericRecord>(schema);
+        DataFileWriter<GenericRecord> dataFileWriter = new DataFileWriter<GenericRecord>(datumWriter);
+        dataFileWriter.create(schema, file);
+        dataFileWriter.append(user1);
+        dataFileWriter.append(user2);
+        dataFileWriter.close();
+
+        // Deserialize users from disk
+        DatumReader<GenericRecord> datumReader = new GenericDatumReader<GenericRecord>(schema);
+        DataFileReader<GenericRecord> dataFileReader = new DataFileReader<GenericRecord>(file, datumReader);
+        GenericRecord user = null;
+        while (dataFileReader.hasNext()) {
+            // Reuse user object by passing it to next(). This saves us from
+            // allocating and garbage collecting many objects for files with
+            // many items.
+            user = dataFileReader.next(user);
+            System.out.println(user);
+        }
+
+    }
+}
+```
+查看保存在users.avro中内容
+![avro-binary](avro-binary.png)
