@@ -1,4 +1,8 @@
-
+---
+layout: post
+title: Apache Avro 小结
+---
+
 # Apache Avro 小结
 >[Apache Avro™ 1.8.2 Overview](http://avro.apache.org/docs/current/index.html)
 > [ Apache Avro™ 1.8.2 Getting Started(Java)](http://avro.apache.org/docs/current/gettingstartedjava.html)
