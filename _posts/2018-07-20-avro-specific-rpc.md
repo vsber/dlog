@@ -1,4 +1,8 @@
-
+---
+layout: default
+title: Apache Avro Specific Rpc
+---
+
 # Specific Rpc
 > * 使用avro-tools 对protocol文件编译生成java源码文件
 > * 使用http 或者 netty 方式传输

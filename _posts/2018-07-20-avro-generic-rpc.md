@@ -1,3 +1,7 @@
+---
+layout: default
+title: Apache Avro Generic Rpc
+---
 
 # Generic Rpc
 

@@ -56,7 +56,7 @@ Avro supports six kinds of complex types: **records**, **enums**, **arrays**, **
 ### Object Container Files
 Avro includes a simple object container file format. A file has a schema, and all objects stored in the file must be written according to that schema, using binary encoding. Objects are stored in blocks that may be compressed. Syncronization markers are used between blocks to permit efficient splitting of files for MapReduce processing.
 avro 也引入了简单对象容器文件格式(simple object container file format)，二进制编码的形式写入。对象在文件中以块(Block)来组织，并且这些对象都是可以被压缩的。块和块之间会存在同步标记符(Synchronization Marker)，以便MapReduce方便地切割文件用于处理。下图是文件结构图：
-![wdjgt](wdjgt.png)
+![wdjgt](/assets/20180720-wdjgt.png)
 上图已经对各块做肢解操作，但还是有必要再详细说明下。一个存储文件由两部分组成:头信息(Header)和数据块(Data Block)。而头信息又由三部分构成：四个字节的前缀(类似于Magic Number)，文件Meta-data信息和随机生成的16字节同步标记符。这里的Meta-data信息让人有些疑惑，它除了文件的模式外，还能包含什么。文档中指出当前Avro认定的就两个Meta-data：schema和codec。这里的codec表示对后面的文件数据块(File Data Block)采用何种压缩方式。Avro的实现都需要支持下面两种压缩方式：null(不压缩)和deflate(使用Deflate算法压缩数据块)。除了文档中认定的两种Meta-data，用户还可以自定义适用于自己的Meta-data。这里用long型来表示有多少个Meta-data数据对，也是让用户在实际应用中可以定义足够的Meta-data信息。对于每对Meta-data信息，都有一个string型的key(需要以“avro.”为前缀)和二进制编码后的value。对于文件中头信息之后的每个数据块，有这样的结构：一个long值记录当前块有多少个对象，一个long值用于记录当前块经过压缩后的字节数，真正的序列化对象和16字节长度的同步标记符。由于对象可以组织成不同的块，使用时就可以不经过反序列化而对某个数据块进行操作。还可以由数据块数，对象数和同步标记符来定位损坏的块以确保数据完整性。
 
 ### Protocol Declaration
@@ -116,7 +116,7 @@ For example, one may define a simple HelloWorld protocol with:
 http 传输，使用post 方式、二进制编码 无状态传输
 #### Message Framing
 在Avro中，它的消息被封装成为一组缓冲区(Buffer)，类似于下图的模型
-![csmx](csmx.png)
+![csmx](/assets/20180720-csmx.png)
 如上图，每个缓冲区以四个字节开头，中间是多个字节的缓冲数据，最后以一个空缓冲区结尾。这种机制的好处在于，发送端在发送数据时可以很方便地组装不同数据源的数据，接收方也可以将数据存入不同的存储区。还有，当往缓冲区中写数据时，大对象可以独占一个缓冲区，而不是与其它小对象混合存放，便于接收方方便地读取大对象。
 #### Handshake
 avro使用握手判断两边使用的avro protocol一致，进而双方进行交互。客户端发送`HandShakeRequest`，服务端根据请求中携带的hash值进行校验响应后返回对应的`HandsHakeResponse`,客户端对`HandsHakeResponse`校验是否匹配。
