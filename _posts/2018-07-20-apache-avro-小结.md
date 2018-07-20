@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title: Apache Avro 小结
 ---
 
